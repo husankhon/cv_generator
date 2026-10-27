@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ profile.name }} — Resume</title>
+    <style>
+        /* ── PDF Resume Styles ────────────────────────────
+             xhtml2pdf has limited CSS support — using simple,
+             print-friendly styles with inline-friendly layouts.
+        ────────────────────────────────────────────────── */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background-color: #1e1b4b;
+            color: #ffffff;
+            padding: 36pt 40pt 28pt;
+        }
+        .header h1 {
+            font-size: 26pt;
+            font-weight: bold;
+            letter-spacing: -0.5pt;
+            margin-bottom: 4pt;
+        }
+        .header .tagline {
+            font-size: 12pt;
+            color: #c4b5fd;
+            margin-bottom: 14pt;
+        }
+        .contact-row {
+            font-size: 9.5pt;
+            color: #e0e7ff;
+        }
+        .contact-row span {
+            margin-right: 20pt;
+        }
+
+        /* Body */
+        .body-content {
+            padding: 28pt 40pt 40pt;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 22pt;
+        }
+        .section-title {
+            font-size: 10pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5pt;
+            color: #4338ca;
+            border-bottom: 2pt solid #e0e7ff;
+            padding-bottom: 4pt;
+            margin-bottom: 10pt;
+        }
+
+        /* Summary */
+        .summary-text {
+            font-size: 10.5pt;
+            line-height: 1.7;
+            color: #374151;
+            padding: 10pt 14pt;
+            background-color: #f5f3ff;
+            border-left: 3pt solid #6366f1;
+        }
+
+        /* Education Table */
+        .edu-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .edu-table td {
+            padding: 8pt 12pt;
+            background-color: #faf5ff;
+            border: 1pt solid #ede9fe;
+            vertical-align: top;
+            width: 50%;
+        }
+        .edu-label {
+            font-size: 7.5pt;
+            text-transform: uppercase;
+            letter-spacing: 1pt;
+            color: #7c3aed;
+            font-weight: bold;
+            margin-bottom: 2pt;
+        }
+        .edu-value {
+            font-size: 10.5pt;
+            font-weight: bold;
+            color: #1e1b4b;
+        }
+
+        /* Work Experience */
+        .work-item {
+            padding: 5pt 0;
+            border-bottom: 0.5pt solid #f3f4f6;
+            font-size: 10.5pt;
+            color: #374151;
+            line-height: 1.6;
+        }
+        .work-bullet {
+            color: #6366f1;
+            font-weight: bold;
+            margin-right: 6pt;
+        }
+
+        /* Skills */
+        .skills-list {
+            font-size: 10.5pt;
+            color: #3730a3;
+            line-height: 2;
+        }
+        .skill-item {
+            display: inline;
+            padding: 4pt 10pt;
+            background-color: #eef2ff;
+            border: 0.5pt solid #c7d2fe;
+            margin-right: 4pt;
+            font-size: 9.5pt;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>{{ profile.name }}</h1>
+        <div class="tagline">{{ profile.degree }}</div>
+        <div class="contact-row">
+            <span>✉ {{ profile.email }}</span>
+            <span>☎ {{ profile.phone }}</span>
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="body-content">
+
+        <!-- Summary -->
+        <div class="section">
+            <div class="section-title">Professional Summary</div>
+            <div class="summary-text">{{ profile.summary }}</div>
+        </div>
+
+        <!-- Education -->
+        <div class="section">
+            <div class="section-title">Education</div>
+            <table class="edu-table">
+                <tr>
+                    <td>
+                        <div class="edu-label">Degree</div>
+                        <div class="edu-value">{{ profile.degree }}</div>
+                    </td>
+                    <td>
+                        <div class="edu-label">University</div>
+                        <div class="edu-value">{{ profile.university }}</div>
+                    </td>
+                </tr>
+                {% if profile.school %}
+                <tr>
+                    <td colspan="2">
+                        <div class="edu-label">School</div>
+                        <div class="edu-value">{{ profile.school }}</div>
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+
+        <!-- Work Experience -->
+        {% if profile.previous_work %}
+        <div class="section">
+            <div class="section-title">Work Experience</div>
+            {% for line in profile.previous_work.splitlines %}
+                {% if line.strip %}
+                <div class="work-item">
+                    <span class="work-bullet">▸</span> {{ line }}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Skills -->
+        {% if profile.skills %}
+        <div class="section">
+            <div class="section-title">Skills</div>
+            <div class="skills-list">
+                {% for skill in profile.skills.split:"," %}
+                    <span class="skill-item">{{ skill|striptags }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>

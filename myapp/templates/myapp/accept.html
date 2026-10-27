@@ -1,0 +1,360 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Create New CV — CV Generator{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Form Page Layout ─────────────────────────── */
+    .form-page {
+        padding: 3rem 0;
+    }
+    .form-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .form-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.5rem;
+    }
+    .form-header h1 .gradient-text {
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .form-header p {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+    }
+
+    /* ── Form Card ────────────────────────────────── */
+    .form-card {
+        max-width: 720px;
+        margin: 0 auto;
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        padding: 2.5rem;
+        backdrop-filter: blur(10px);
+        box-shadow: var(--shadow-card);
+        position: relative;
+        overflow: hidden;
+    }
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+    }
+
+    /* ── Form Sections ────────────────────────────── */
+    .form-section {
+        margin-bottom: 2.25rem;
+    }
+    .form-section:last-of-type {
+        margin-bottom: 0;
+    }
+    .form-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-subtle);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-size: 0.85rem;
+    }
+    .form-section-title .section-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        background: rgba(139, 92, 246, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    /* ── Form Fields ──────────────────────────────── */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .form-row.full {
+        grid-template-columns: 1fr;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 1rem;
+    }
+    .form-group label {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        letter-spacing: 0.02em;
+    }
+    .form-group label .required {
+        color: var(--danger);
+        margin-left: 2px;
+    }
+    .form-group input,
+    .form-group textarea {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: 12px 16px;
+        font-family: inherit;
+        font-size: 0.92rem;
+        color: var(--text-primary);
+        transition: all var(--transition);
+        outline: none;
+        width: 100%;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-muted);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+        background: rgba(22, 22, 39, 1);
+    }
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+        line-height: 1.6;
+    }
+    .form-group .field-hint {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    /* ── Step indicator ───────────────────────────── */
+    .step-indicator {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .step-dot {
+        width: 40px;
+        height: 4px;
+        border-radius: 100px;
+        background: var(--border-subtle);
+        transition: all var(--transition);
+    }
+    .step-dot.active {
+        background: var(--gradient-primary);
+        width: 56px;
+    }
+
+    /* ── Submit Button ────────────────────────────── */
+    .form-submit {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-subtle);
+    }
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 36px;
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        transition: all var(--transition);
+        background: var(--gradient-primary);
+        color: #fff;
+        box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px var(--accent-glow);
+    }
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: var(--radius-md);
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-subtle);
+        transition: all var(--transition);
+    }
+    .btn-cancel:hover {
+        color: var(--text-primary);
+        border-color: var(--border-accent);
+    }
+
+    /* ── Responsive ───────────────────────────────── */
+    @media (max-width: 640px) {
+        .form-card { padding: 1.5rem; }
+        .form-row { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="form-page">
+
+        <!-- Header -->
+        <div class="form-header">
+            <h1>Create Your <span class="gradient-text">New CV</span></h1>
+            <p>Fill in the details below and we'll generate a stunning resume for you.</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator" id="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot active"></div>
+        </div>
+
+        <!-- Form -->
+        <div class="form-card slide-up">
+            <form method="POST" action="{% url 'save_profile' %}" id="cv-form">
+                {% csrf_token %}
+
+                <!-- Personal Info -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="section-icon">👤</span>
+                        Personal Information
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" placeholder="e.g. John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" placeholder="e.g. john@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="phone" name="phone" placeholder="e.g. +92 300 1234567" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="section-icon">🎓</span>
+                        Education
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="degree">Degree <span class="required">*</span></label>
+                            <input type="text" id="degree" name="degree" placeholder="e.g. BS Computer Science" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="school">School / College</label>
+                            <input type="text" id="school" name="school" placeholder="e.g. City High School">
+                        </div>
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="university">University</label>
+                            <input type="text" id="university" name="university" placeholder="e.g. FAST-NUCES">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="section-icon">💼</span>
+                        Professional Details
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="summary">Professional Summary <span class="required">*</span></label>
+                            <textarea id="summary" name="summary" rows="4" placeholder="Write a short paragraph about yourself, your career goals, and what makes you unique..." required></textarea>
+                            <span class="field-hint">A concise summary (2-4 sentences) highlighting your strengths.</span>
+                        </div>
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="previous_work">Work Experience</label>
+                            <textarea id="previous_work" name="previous_work" rows="4" placeholder="e.g.&#10;Software Engineer at Google (2022-2024)&#10;Intern at Microsoft (Summer 2021)"></textarea>
+                            <span class="field-hint">List your previous roles, one per line.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="section-icon">⚡</span>
+                        Skills
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="skills">Skills <span class="required">*</span></label>
+                            <input type="text" id="skills" name="skills" placeholder="e.g. Python, Django, JavaScript, React, SQL" required>
+                            <span class="field-hint">Separate skills with commas.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-submit">
+                    <a href="{% url 'dashboard' %}" class="btn-cancel" id="cancel-btn">Cancel</a>
+                    <button type="submit" class="btn-submit" id="submit-btn">
+                        <span>✦</span> Generate CV
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Real-time focus glow effect on form sections
+    document.querySelectorAll('.form-group input, .form-group textarea').forEach(el => {
+        el.addEventListener('focus', () => {
+            el.closest('.form-section').style.borderLeft = '2px solid var(--accent)';
+            el.closest('.form-section').style.paddingLeft = '1rem';
+        });
+        el.addEventListener('blur', () => {
+            el.closest('.form-section').style.borderLeft = 'none';
+            el.closest('.form-section').style.paddingLeft = '0';
+        });
+    });
+</script>
+{% endblock %}

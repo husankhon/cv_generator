@@ -1,0 +1,381 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}{{ profile.name }} — Resume Preview{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Resume Page ──────────────────────────────── */
+    .resume-page {
+        padding: 2.5rem 0;
+    }
+
+    /* ── Action Bar ───────────────────────────────── */
+    .action-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .action-bar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: var(--radius-sm);
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        transition: all var(--transition);
+    }
+    .back-btn:hover {
+        color: var(--text-primary);
+        border-color: var(--border-accent);
+    }
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        padding: 10px 24px;
+        border-radius: var(--radius-md);
+        font-size: 0.9rem;
+        font-weight: 600;
+        background: var(--gradient-primary);
+        color: #fff;
+        box-shadow: 0 4px 20px var(--accent-glow);
+        transition: all var(--transition);
+    }
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    /* ── Resume Document ──────────────────────────── */
+    .resume-document {
+        max-width: 860px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: var(--radius-xl);
+        box-shadow:
+            0 20px 60px rgba(0,0,0,0.4),
+            0 0 0 1px rgba(255,255,255,0.05);
+        overflow: hidden;
+        color: #1a1a2e;
+    }
+
+    /* ── Resume Header ────────────────────────────── */
+    .resume-header {
+        background: linear-gradient(135deg, #1e1b4b, #312e81, #3730a3);
+        padding: 3rem 3rem 2.5rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+    }
+    .resume-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+        background: rgba(139, 92, 246, 0.15);
+        pointer-events: none;
+    }
+    .resume-name {
+        font-size: 2.4rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.25rem;
+        position: relative;
+        z-index: 1;
+    }
+    .resume-tagline {
+        font-size: 1.1rem;
+        font-weight: 400;
+        opacity: 0.8;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    .resume-contacts {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+    .resume-contact-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        opacity: 0.9;
+    }
+    .resume-contact-item .contact-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    /* ── Resume Body ──────────────────────────────── */
+    .resume-body {
+        padding: 2.5rem 3rem 3rem;
+    }
+
+    .resume-section {
+        margin-bottom: 2.25rem;
+    }
+    .resume-section:last-child {
+        margin-bottom: 0;
+    }
+    .resume-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #4338ca;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e7ff;
+    }
+    .resume-section-title .section-bar {
+        width: 4px;
+        height: 18px;
+        border-radius: 100px;
+        background: linear-gradient(180deg, #6366f1, #8b5cf6);
+    }
+
+    /* ── Summary ──────────────────────────────────── */
+    .resume-summary {
+        font-size: 0.95rem;
+        line-height: 1.75;
+        color: #374151;
+        padding: 1.25rem;
+        background: #f5f3ff;
+        border-radius: var(--radius-md);
+        border-left: 4px solid #6366f1;
+    }
+
+    /* ── Education ────────────────────────────────── */
+    .edu-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .edu-card {
+        padding: 1.25rem;
+        background: #faf5ff;
+        border-radius: var(--radius-md);
+        border: 1px solid #ede9fe;
+    }
+    .edu-card .edu-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #7c3aed;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .edu-card .edu-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e1b4b;
+    }
+
+    /* ── Work Experience ──────────────────────────── */
+    .work-list {
+        list-style: none;
+        padding: 0;
+    }
+    .work-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .work-item:last-child {
+        border-bottom: none;
+    }
+    .work-bullet {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6366f1;
+        margin-top: 7px;
+        flex-shrink: 0;
+    }
+    .work-text {
+        font-size: 0.92rem;
+        color: #374151;
+        line-height: 1.6;
+    }
+
+    /* ── Skills ────────────────────────────────────── */
+    .skills-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .skill-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+        color: #3730a3;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid #c7d2fe;
+        transition: all 0.2s ease;
+    }
+    .skill-chip:hover {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        border-color: transparent;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* ── Responsive ───────────────────────────────── */
+    @media (max-width: 640px) {
+        .resume-header { padding: 2rem 1.5rem; }
+        .resume-body   { padding: 1.5rem; }
+        .resume-name   { font-size: 1.8rem; }
+        .edu-grid      { grid-template-columns: 1fr; }
+        .resume-contacts { flex-direction: column; gap: 0.75rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="resume-page">
+
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <div class="action-bar-left">
+                <a href="{% url 'dashboard' %}" class="back-btn" id="back-btn">← Back</a>
+            </div>
+            <a href="{% url 'download_resume' profile.id %}" class="download-btn" id="pdf-download-btn">
+                ⬇ Download PDF
+            </a>
+        </div>
+
+        <!-- Resume Document -->
+        <div class="resume-document slide-up" id="resume-doc">
+
+            <!-- Header -->
+            <div class="resume-header">
+                <div class="resume-name">{{ profile.name }}</div>
+                <div class="resume-tagline">{{ profile.degree }}</div>
+                <div class="resume-contacts">
+                    <div class="resume-contact-item">
+                        <span class="contact-icon">✉</span>
+                        <span>{{ profile.email }}</span>
+                    </div>
+                    <div class="resume-contact-item">
+                        <span class="contact-icon">📞</span>
+                        <span>{{ profile.phone }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="resume-body">
+
+                <!-- Summary -->
+                <div class="resume-section">
+                    <div class="resume-section-title">
+                        <span class="section-bar"></span>
+                        Professional Summary
+                    </div>
+                    <div class="resume-summary">{{ profile.summary }}</div>
+                </div>
+
+                <!-- Education -->
+                <div class="resume-section">
+                    <div class="resume-section-title">
+                        <span class="section-bar"></span>
+                        Education
+                    </div>
+                    <div class="edu-grid">
+                        <div class="edu-card">
+                            <div class="edu-label">Degree</div>
+                            <div class="edu-value">{{ profile.degree }}</div>
+                        </div>
+                        {% if profile.school %}
+                        <div class="edu-card">
+                            <div class="edu-label">School</div>
+                            <div class="edu-value">{{ profile.school }}</div>
+                        </div>
+                        {% endif %}
+                        {% if profile.university %}
+                        <div class="edu-card">
+                            <div class="edu-label">University</div>
+                            <div class="edu-value">{{ profile.university }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Work Experience -->
+                {% if profile.previous_work %}
+                <div class="resume-section">
+                    <div class="resume-section-title">
+                        <span class="section-bar"></span>
+                        Work Experience
+                    </div>
+                    <ul class="work-list">
+                        {% for line in profile.previous_work.splitlines %}
+                            {% if line.strip %}
+                            <li class="work-item">
+                                <span class="work-bullet"></span>
+                                <span class="work-text">{{ line }}</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- Skills -->
+                {% if profile.skills %}
+                <div class="resume-section">
+                    <div class="resume-section-title">
+                        <span class="section-bar"></span>
+                        Skills
+                    </div>
+                    <div class="skills-cloud">
+                        {% for skill in profile.skills.split:"," %}
+                            <span class="skill-chip">{{ skill|striptags }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
